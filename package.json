@@ -20,6 +20,7 @@
     "body-parser": "^1.11.0",
     "express": "^4.11.1",
     "mongoose": "^3.8.22",
-    "node-restful": "^0.1.18"
+    "node-restful": "^0.1.18",
+    "restify": "^2.8.5"
   }
 }

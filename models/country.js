@@ -1,9 +1,8 @@
-var restful = require('node-restful');
-var mongoose = restful.mongoose;
+var mongoose = require('mongoose');
 
 var countrySchema = new mongoose.Schema({
-  country: String,
-  last_update: { type: Date }
+  name: String,
+  last_update: { type: Date, default: Date.now }
 });
 
-module.exports = restful.model('Countries', countrySchema);
+module.exports = mongoose.model('Country', countrySchema);
