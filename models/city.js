@@ -1,10 +1,10 @@
-var restful = require('node-restful');
-var mongoose = restful.mongoose;
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
-var citySchema = new mongoose.Schema({
-  city: String,
+var citySchema = new Schema({
+  name: String,
   country: [{ type: Schema.Types.ObjectId, ref: 'Country' }],
   last_update: { type: Date }
 });
 
-module.exports = restful.model('City', citySchema);
+module.exports = mongoose.model('City', citySchema);
