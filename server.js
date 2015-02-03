@@ -37,7 +37,9 @@ server.del('/countries/:id', controllers.country.delCountry);
 
 // Customer requests
 server.get('/customers', controllers.customer.getCustomer);
+server.get('/customers/:id', controllers.customer.getCustomer);
 server.post('/customers', controllers.customer.postCustomer);
+server.del('/customers/:id', controllers.customer.delCustomer);
 
 var port = 3000;
 server.listen(port, function (err) {
