@@ -1,11 +1,87 @@
-// City Model 
+// Dependencies
 var mongoose = require('mongoose'),
-	City = mongoose.model('City');
+    City = mongoose.model('City');
 
-exports.getCity = function(req, res) {}
+exports.getCity = function(req, res, next) {
+  console.log(req.params.q);
+  if (!(req.params.id === undefined ||
+    req.params.id === '')) {
+    City.findById(req.params.id, function(err, data) {
+      if (err) {
+        res.json(500, {
+          message: 'Error occured: ' + err
+        });
+      } else {
+        res.json(200, {
+          name: data.name,
+          link: 'cities/' + data._id
+        });
+      }
+    });
+  } else {
+    City.find({}, function(err, data) {
+      if (err) {
+        res.json(500, {
+          message: 'Error occured: ' + err
+        });
+      } else {
+        var i, results = [];
+        for (i = 0; i < data.length; i++) {
+          results[i] = {
+            name: data[i].name,
+            link: 'cities/' + data[i]._id
+          };
+        }
+        res.json(200, results);
+      }
+    })
+  }
+}
 
-exports.deleteCity = function (req, res) {}
+exports.postCity = function(req, res, next) {
+  var name = JSON.parse(req.body).name;
+  var countryID = JSON.parse(req.body).country;
+  if (!(name === undefined ||
+    name === '')) {
+  	Country.findById(countryID, function(err, data) {
+      if (err) {
+        res.json(500, {
+          message: 'Error occured: ' + err
+        });
+      } else {
+        var city = new City();
+	    city.name = name;
+	    city.country = countryID;
+	    city.last_update = new Date();
+	    city.save(function () {
+	      res.send(req.body);
+	    });
+      }
+    });
+  }
+}
 
-exports.postCity = function(req, res) {}
+exports.putCity = function(req, res, next) {
 
-exports.putCity = function(req, res) {}
+}
+
+exports.delCity = function(req, res, next) {
+  if (!(req.params.id === undefined ||
+    req.params.id === '')) {
+    City.findByIdAndRemove(req.params.id, function(err, data) {
+      if (err) {
+        res.json(500, {
+          message: 'Error occured: ' + err
+        });
+      } else {
+        res.json(204, {
+          message: 'Delete successful'
+        });
+      }
+    });
+  }
+}
+
+exports.query = function(req, res, next) {
+  console.log(req.params);
+}
