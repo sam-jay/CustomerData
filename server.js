@@ -26,11 +26,11 @@ fs.readdirSync('./controllers').forEach(function (file) {
 var server = restify.createServer();
 
 server.use(restify.fullResponse());
-server.use(restify.bodyParser());
+server.use(restify.bodyParser({ mapParams: true }));
 
 server.get('/countries', controllers.country.getCountry);
 server.get('/countries/:id', controllers.country.getCountry);
-//server.post('/countries', controllers.country.postCountry);
+server.post('/countries', controllers.country.postCountry);
 //server.put('/countries/:id', controllers.country.putCountry);
 server.del('/countries/:id', controllers.country.delCountry);
 
