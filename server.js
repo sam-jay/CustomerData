@@ -28,11 +28,16 @@ var server = restify.createServer();
 server.use(restify.fullResponse());
 server.use(restify.bodyParser({ mapParams: true }));
 
+// Country requests
 server.get('/countries', controllers.country.getCountry);
 server.get('/countries/:id', controllers.country.getCountry);
 server.post('/countries', controllers.country.postCountry);
 //server.put('/countries/:id', controllers.country.putCountry);
 server.del('/countries/:id', controllers.country.delCountry);
+
+// Customer requests
+server.get('/customers', controllers.customer.getCustomer);
+server.post('/customers', controllers.customer.postCustomer);
 
 var port = 3000;
 server.listen(port, function (err) {
