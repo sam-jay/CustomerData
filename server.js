@@ -42,7 +42,7 @@ server.post('/customers', controllers.customer.postCustomer);
 server.del('/customers/:id', controllers.customer.delCustomer);
 
 // City requests
-server.get(/^\/api\/cities\/(\d+)\/country|\/country\//, controllers.city.getCountry);
+server.get('/api/cities/:id/country', controllers.city.getCountry);
 
 var port = 3000;
 server.listen(port, function (err) {
