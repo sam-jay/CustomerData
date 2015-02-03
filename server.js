@@ -26,7 +26,7 @@ fs.readdirSync('./controllers').forEach(function (file) {
 var server = restify.createServer();
 
 server.use(restify.fullResponse());
-server.use(restify.bodyParser({ mapParams: true }));
+server.use(restify.bodyParser());
 
 // Country requests
 server.get('/countries', controllers.country.getCountry);
@@ -40,6 +40,9 @@ server.get('/customers', controllers.customer.getCustomer);
 server.get('/customers/:id', controllers.customer.getCustomer);
 server.post('/customers', controllers.customer.postCustomer);
 server.del('/customers/:id', controllers.customer.delCustomer);
+
+// City requests
+server.get(/^\/api\/cities\/(\d+)\/country|\/country\//, controllers.city.getCountry);
 
 var port = 3000;
 server.listen(port, function (err) {
