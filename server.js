@@ -36,10 +36,17 @@ server.post('/countries', controllers.country.postCountry);
 server.del('/countries/:id', controllers.country.delCountry);
 
 // Customer requests
+//server.get('/customers/:id/name');
+//server.get('/customers/:id/name/first');
+//server.get('/customers/:id/name/last');
+//server.get('/customers/:id/address');
+//server.get('/customers/:id/address/city');
+//server.get('/customers/:id/address/city/country');
 server.get('/customers', controllers.customer.getCustomer);
 server.get('/customers/:id', controllers.customer.getCustomer);
 server.post('/customers', controllers.customer.postCustomer);
 server.del('/customers/:id', controllers.customer.delCustomer);
+
 
 // City requests
 server.get('/api/cities/:id/country', controllers.city.getCountry);
