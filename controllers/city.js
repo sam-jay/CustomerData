@@ -2,6 +2,10 @@
 var mongoose = require('mongoose'),
     City = mongoose.model('City');
 
+exports.getCountry = function(req, res, next) {
+  console.log(req.params);
+}
+
 exports.getCity = function(req, res, next) {
   console.log(req.params.q);
   if (!(req.params.id === undefined ||
