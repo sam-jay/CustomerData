@@ -10,7 +10,7 @@
     "type": "git",
     "url": "https://github.com/sam-jay/CustomerData"
   },
-  "author": "",
+  "author": "arRESTed development",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/sam-jay/CustomerData/issues"
@@ -18,9 +18,7 @@
   "homepage": "https://github.com/sam-jay/CustomerData",
   "dependencies": {
     "body-parser": "^1.11.0",
-    "express": "^4.11.1",
     "mongoose": "^3.8.22",
-    "node-restful": "^0.1.18",
     "restify": "^2.8.5"
   }
 }
