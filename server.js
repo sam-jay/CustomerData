@@ -29,27 +29,49 @@ server.use(restify.fullResponse());
 server.use(restify.bodyParser());
 
 // Country requests
-server.get('/countries', controllers.country.getCountry);
-server.get('/countries/:id', controllers.country.getCountry);
-server.post('/countries', controllers.country.postCountry);
-//server.put('/countries/:id', controllers.country.putCountry);
-server.del('/countries/:id', controllers.country.delCountry);
-
-// Customer requests
-//server.get('/customers/:id/name');
-//server.get('/customers/:id/name/first');
-//server.get('/customers/:id/name/last');
-//server.get('/customers/:id/address');
-//server.get('/customers/:id/address/city');
-//server.get('/customers/:id/address/city/country');
-server.get('/customers', controllers.customer.getCustomer);
-server.get('/customers/:id', controllers.customer.getCustomer);
-server.post('/customers', controllers.customer.postCustomer);
-server.del('/customers/:id', controllers.customer.delCustomer);
-
+server.get('/api/countries', controllers.country.getCountry, controllers.presenter.present);
+server.get('/api/countries/:id', controllers.country.getCountry, controllers.presenter.present);
+server.post('/api/countries', controllers.country.postCountry);
+server.put('/api/countries/:id', controllers.country.putCountry);
+server.del('/api/countries/:id', controllers.country.delCountry);
 
 // City requests
-server.get('/api/cities/:id/country', controllers.city.getCountry);
+server.get('/api/cities', controllers.city.getCity, controllers.presenter.present);
+server.get('/api/cities/:id', controllers.city.getCity, controllers.presenter.present);
+server.get('/api/cities/:id/country', controllers.city.getCity, controllers.presenter.present);
+server.post('/api/cities', controllers.city.postCity);
+server.put('/api/cities/:id', controllers.city.putCity);
+server.del('/api/cities/:id', controllers.city.delCity);
+
+// Address requests
+server.get('/api/addresses', controllers.address.getAddress, controllers.presenter.present);
+server.get('/api/addresses/:id', controllers.address.getAddress, controllers.presenter.present);
+server.get('/api/addresses/:id/city', controllers.address.getAddress, controllers.presenter.present);
+server.get('/api/addresses/:id/city/country', controllers.address.getAddress, controllers.presenter.present);
+server.post('/api/addresses', controllers.address.postAddress);
+server.put('/api/addresses/:id', controllers.address.putAddress);
+server.del('/api/addresses/:id', controllers.address.delAddress);
+
+// Customer requests
+server.get('/api/customers', controllers.customer.getCustomer, controllers.presenter.present);
+server.get('/api/customers/:id', controllers.customer.getCustomer, controllers.presenter.present);
+server.get('/api/customers/:id/address', controllers.customer.getCustomer,
+                                         controllers.address.getAddress,
+                                         controllers.presenter.present);
+server.get('/api/customers/:id/address/city', controllers.customer.getCustomer,
+                                              controllers.address.getAddress,
+                                              controllers.city.getCity,
+                                              controllers.presenter.present);
+server.get('/api/customers/:id/address/city/country', controllers.customer.getCustomer, 
+                                                      controllers.address.getAddress,
+                                                      controllers.city.getCity,
+                                                      controllers.country.getCountry,
+                                                      controllers.presenter.present);
+server.post('/api/addresses', controllers.address.postAddress);
+server.put('/api/addresses/:id', controllers.address.putAddress);
+server.del('/api/addresses/:id', controllers.address.delAddress);
+
+
 
 var port = 3000;
 server.listen(port, function (err) {
