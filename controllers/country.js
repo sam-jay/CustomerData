@@ -48,19 +48,34 @@ exports.postCountry = function(req, res, next) {
 }
 
 exports.putCountry = function(req, res, next) {
-  var new_name = JSON.parse(req.body).country;
+  var country_name;
+ 
+  try {
+    country_name = JSON.parse(req.body).country;
+  } catch (e) {
+    return res.json(400, {
+      message: 'Invalid parameter' 
+    });
+  }
+
+  if (validator.isNull(country_name)) {
+    return res.json(400, {
+      message: 'Invalid parameter'
+    });
+  }
+  
   Country.findById(req.params.id, function(err, data) {
     if (err)
       return res.json(404, {
         message: 'Resource not found'
       });
-    data.country = new_name;
+    data.country = country_name;
     data.last_update = new Date();
     res.json(202, {
       message: 'Accepted (Operation Pending)',
       url: '/api/countries/' + data._id
     });
-    country.save();
+    return country.save();
   });
 }
 
