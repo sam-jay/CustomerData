@@ -3,53 +3,32 @@ var mongoose = require('mongoose'),
 
 exports.present = function (req, res, next) {
 
-  var query = { },
-      pagination = { skip: 0, limit: default_limit },
-      fields = { };
-
-  if (req.query.q !== undefined)
-    query = parseQuery(req.query.q);
-
-  if (req.query.limit !== undefined || req.query.offset !== undefined)
-    pagination = parseLimitOffset(req.query);
-
-  if (req.query.fields !== undefined)
-    fields = parseFields(req.query.fields);
-
-  var Resource = mongoose.model(req.prev);
-  Resource
-  .find(query)
-  .select(fields)
-  .skip(pagination.skip)
-  .limit(pagination.limit)
+  // req.params.prev contains the name of Model we're looking up
+  mongoose.model(req.params.prev)
+  .find(req.query.q !== undefined ? parseQuery(req.query.q) : { })
+  .select(req.query.fields !== undefined ? req.query.fields.replace(',', ' ') : { })
+  .skip(req.query.offset !== undefined ? req.query.offset : 0)
+  .limit(req.query.limit !== undefined ? req.query.limit : default_limit)
   .exec(function (err, data) {
-    if (err)
-      return res.json(404, {  
-        message: 'Resource not found'
-      });
-    /// VVVVVVVVVVVVVV
-    return res.json(data);
+    return respond(err, data, res);
   });
+
+  var parseQuery = function (str) {
+    return JSON.parse('{ "$and": [' + str.split('&&').map(function (str) {
+      return '{ "$or": [' + str.split('||').map(function (str) {
+        return '{' + str.split('=').map(function (str) {
+          return '"' + str + '"';
+        }).join(': ') + '}';
+      }).join(', ') + '] }';
+    }).join(', ') + '] }');
+  }
 
 };
 
-var parseQuery = function (q) {
-  return JSON.parse('{ "$and": [' + q.split('&&').map(function (str) {
-    return '{ "$or": [' + str.split('||').map(function (str) {
-      return '{' + str.split('=').map(function (str) {
-        return '"' + str + '"';
-      }).join(': ') + '}';
-    }).join(', ') + '] }';
-  }).join(', ') + '] }');
-}
-
-var parseLimitOffset = function (q) {
-  return {
-    skip: q.offset,
-    limit: q.limit
-  };
-}
-
-var parseFields = function (fields) {
-  return fields.replace(',', ' ');
-}
+var respond = function (err, data, res) {
+  if (err)
+    return res.json(404, {
+      message: 'Resource not found'
+    });
+  return res.json(200, data);
+};
