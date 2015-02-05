@@ -53,6 +53,10 @@ exports.putCountry = function(req, res, next) {
   if (validator.isNull(country_name)) 
     return error.respond(400, res, 'Cannot parse input'); 
 
+  res.json(202, {
+    message: ''
+  });
+
   Country.findById(req.params.id, function(err, data) {
     if (err)
       return error.respond(404, res, req.params.id);
