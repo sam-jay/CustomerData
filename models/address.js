@@ -8,7 +8,7 @@ var addressSchema = new Schema({
   city_id: [{ type: Schema.Types.ObjectId, ref: 'City' }],
   postal_code: String,
   phone: String,
-  last_update: { type: Date }
+  last_update: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Address', addressSchema);
