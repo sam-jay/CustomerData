@@ -5,7 +5,7 @@ var addressSchema = new Schema({
   address: String,
   address2: String,
   district: String,
-  city: [{ type: Schema.Types.ObjectId, ref: 'City' }],
+  city_id: [{ type: Schema.Types.ObjectId, ref: 'City' }],
   postal_code: String,
   phone: String,
   last_update: { type: Date }

@@ -16,12 +16,6 @@ module.exports.getAddress = function (req, res, next) {
   if (req.query.q !== undefined)
     return next();
 
-  var address = getAddressFromDB(req.params.id);
-  if (address.hasOwnProperty('error'))
-    res.json(500, address)
-  req.params.address = address;
-  return next();
-
   var getAddressFromDB = function (arg) {
     if (arg !== undefined) {
       Address.findById(arg, function(err, data) {
@@ -31,6 +25,14 @@ module.exports.getAddress = function (req, res, next) {
       });
     }
   };
+
+  var address = getAddressFromDB(req.params.id);
+  // if (address.hasOwnProperty('error'))
+  //   res.json(500, address)
+  req.params.address = address;
+  return next();
+
+  
 
 }
 

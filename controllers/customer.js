@@ -1,29 +1,33 @@
-restify// Dependencies
+// Dependencies
 var mongoose = require('mongoose'),
     Customer = mongoose.model('Customer');
+
+
 
 exports.getCustomer = function(req, res, next) {
   req.params.prev = 'Customer';
 
   // If query go to next
-  if (req.query.q !== undefined)
+  if (req.query.q !== undefined) {
     return next();
-
-  var customer = getCustomerFromDB(req.params.id);
-  if (customer.hasOwnProperty('error')) 
-  	res.json(500, customer)
-  req.params.customer = customer;
-  return next();
+  }
 
   var getCustomerFromDB = function (arg) {
     if (arg !== undefined) {
       Customer.findById(arg, function(err, data) {
-      	if (err)
-      		return { error: "Error occured: " + err }
-      	else return data;
+      	if (err) { }
+      		// return { error: "Error occured: " + err }
+      	else {
+      		return data;
+      	}
       });
     }
   };
+
+  var customer = getCustomerFromDB(req.params.id);
+  // console.log('here');
+  req.params.customer = customer;
+  return next(); 
 }
   /*
   console.log(req.params);
@@ -62,7 +66,6 @@ exports.getCustomer = function(req, res, next) {
     	});
     }
 */
-}
 
 exports.postCustomer = function(req, res, next) {
 	var body = JSON.parse(req.body);

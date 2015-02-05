@@ -22,12 +22,6 @@ exports.getCity = function(req, res, next) {
   if (req.query.q !== undefined)
     return next();
 
-  var city = getCityFromDB(req.params.id);
-  if (city.hasOwnProperty('error'))
-    res.json(500, city)
-  req.params.city = city;
-  return next();
-
   var getCityFromDB = function (arg) {
     if (arg !== undefined) {
       City.findById(arg, function(err, data) {
@@ -37,6 +31,14 @@ exports.getCity = function(req, res, next) {
       });
     }
   };
+  
+  var city = getCityFromDB(req.params.id);
+  // if (city.hasOwnProperty('error'))
+  //   res.json(500, city)
+  req.params.city = city;
+  return next();
+
+  
 }
 
 

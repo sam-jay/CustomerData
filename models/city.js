@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 var citySchema = new Schema({
   name: String,
-  country: [{ type: Schema.Types.ObjectId, ref: 'Country' }],
+  country_id: [{ type: Schema.Types.ObjectId, ref: 'Country' }],
   last_update: { type: Date }
 });
 

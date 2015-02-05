@@ -18,12 +18,6 @@ exports.getCountry = function(req, res, next) {
   if (req.query.q !== undefined)
     return next();
 
-  var country = getCountryFromDB(req.params.id);
-  if (country.hasOwnProperty('error'))
-    res.json(500, country)
-  req.params.country = country;
-  return next();
-
   var getCountryFromDB = function (arg) {
     if (arg !== undefined) {
       Country.findById(arg, function(err, data) {
@@ -33,6 +27,14 @@ exports.getCountry = function(req, res, next) {
       });
     }
   };
+  
+  var country = getCountryFromDB(req.params.id);
+  // if (country.hasOwnProperty('error'))
+  //   res.json(500, country)
+  req.params.country = country;
+  return next();
+
+  
 }
 
 //   console.log(req.params.q);

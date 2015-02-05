@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 var customerSchema = new Schema({
   name: { first: String, last: String },
   email: String,
-  address: [{ type: Schema.Types.ObjectId, ref: 'Address' }],
+  address_id: [{ type: Schema.Types.ObjectId, ref: 'Address' }],
   active: Boolean,
   create_date: { type: Date },
   last_update: { type: Date }
