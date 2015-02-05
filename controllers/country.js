@@ -1,5 +1,5 @@
 // Dependencies
-var mongoose = require('mongoose'),
+var mongoose = require('mongoose');
 
 exports.getCountry = function(req, res, next) {
   req.params.prev = 'Country';
