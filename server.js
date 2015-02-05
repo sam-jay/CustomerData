@@ -27,14 +27,16 @@ var server = restify.createServer();
 
 server.use(restify.fullResponse());
 server.use(restify.bodyParser());
+server.use(restify.queryParser());
 
 // Country requests
 server.get('/api/countries', controllers.country.getCountry, controllers.presenter.present);
 server.get('/api/countries/:id', controllers.country.getCountry, controllers.presenter.present);
 server.post('/api/countries', controllers.country.postCountry);
 server.put('/api/countries/:id', controllers.country.putCountry);
-server.del('/api/countries/:id', controllers.country.delCountry);
+//server.del('/api/countries/:id', controllers.country.delCountry);
 
+/*
 // City requests
 server.get('/api/cities', controllers.city.getCity, controllers.presenter.present);
 server.get('/api/cities/:id', controllers.city.getCity, controllers.presenter.present);
@@ -59,6 +61,7 @@ server.post('/api/addresses', controllers.address.postAddress);
 server.put('/api/addresses/:id', controllers.address.putAddress);
 server.del('/api/addresses/:id', controllers.address.delAddress);
 
+
 // Customer requests
 server.get('/api/customers', controllers.customer.getCustomer, controllers.presenter.present);
 server.get('/api/customers/:id', controllers.customer.getCustomer, controllers.presenter.present);
@@ -77,7 +80,7 @@ server.get('/api/customers/:id/address/city/country', controllers.customer.getCu
 server.post('/api/addresses', controllers.address.postAddress);
 server.put('/api/addresses/:id', controllers.address.putAddress);
 server.del('/api/addresses/:id', controllers.address.delAddress);
-
+*/
 
 var port = 3000;
 server.listen(port, function (err) {

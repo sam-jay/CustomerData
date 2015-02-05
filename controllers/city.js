@@ -6,7 +6,7 @@ var mongoose = require('mongoose'),
 exports.getCity = function(req, res, next) {
   req.params.prev = 'City';
   if (req.params.id !== undefined) {
-    mongoose.model('City').findById(req.params.id, function(err, data) {
+    City.findById(req.params.id, function(err, data) {
       if (err)
         return res.json(404, {
           message: 'Resource not found'
