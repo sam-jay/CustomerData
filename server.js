@@ -38,7 +38,9 @@ server.del('/api/countries/:id', controllers.country.delCountry);
 // City requests
 server.get('/api/cities', controllers.city.getCity, controllers.presenter.present);
 server.get('/api/cities/:id', controllers.city.getCity, controllers.presenter.present);
-server.get('/api/cities/:id/country', controllers.city.getCity, controllers.presenter.present);
+server.get('/api/cities/:id/country', controllers.city.getCity, 
+									  controllers.country.getCountry,
+									  controllers.presenter.present);
 server.post('/api/cities', controllers.city.postCity);
 server.put('/api/cities/:id', controllers.city.putCity);
 server.del('/api/cities/:id', controllers.city.delCity);
@@ -46,8 +48,13 @@ server.del('/api/cities/:id', controllers.city.delCity);
 // Address requests
 server.get('/api/addresses', controllers.address.getAddress, controllers.presenter.present);
 server.get('/api/addresses/:id', controllers.address.getAddress, controllers.presenter.present);
-server.get('/api/addresses/:id/city', controllers.address.getAddress, controllers.presenter.present);
-server.get('/api/addresses/:id/city/country', controllers.address.getAddress, controllers.presenter.present);
+server.get('/api/addresses/:id/city', controllers.address.getAddress, 
+									  controllers.city.getCity,
+									  controllers.presenter.present);
+server.get('/api/addresses/:id/city/country', controllers.address.getAddress, 
+											  controllers.city.getCity,
+											  controllers.country.getCountry,
+											  controllers.presenter.present);
 server.post('/api/addresses', controllers.address.postAddress);
 server.put('/api/addresses/:id', controllers.address.putAddress);
 server.del('/api/addresses/:id', controllers.address.delAddress);
@@ -70,7 +77,6 @@ server.get('/api/customers/:id/address/city/country', controllers.customer.getCu
 server.post('/api/addresses', controllers.address.postAddress);
 server.put('/api/addresses/:id', controllers.address.putAddress);
 server.del('/api/addresses/:id', controllers.address.delAddress);
-
 
 
 var port = 3000;
