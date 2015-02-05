@@ -28,7 +28,7 @@ exports.present = function(req, res, next) {
     }
 
   respond = function(err, data, type) {
-    console.log(req.params.data);
+    
     var plural = {
       'Country': 'countries',
       'City': 'cities',
@@ -85,7 +85,7 @@ var pretty = function(obj, type) {
       return {  
         data: { 
           country: obj.country, 
-          last_update: obj.last_update 
+          last_update: obj.last_update.toLocaleString() 
         },
         url: '/api/countries/' + obj._id
       };
@@ -95,7 +95,7 @@ var pretty = function(obj, type) {
         data: { 
           city: obj.city, 
           country: pretty(getObject(obj.country_id, 'Country'), 'Country'), 
-          last_update: obj.last_update
+          last_update: obj.last_update.toLocaleString()
         },
         url: '/api/cities/' + obj._id
       };
@@ -108,7 +108,7 @@ var pretty = function(obj, type) {
           city: pretty(getObject(obj.city_id, 'City'), 'City'),
           postal_code: obj.postal_code,
           phone: obj.postal_code,
-          last_update: obj.last_update
+          last_update: obj.last_update.toLocaleString()
         },
         url: '/api/addresses/' + obj._id
       };
@@ -120,8 +120,8 @@ var pretty = function(obj, type) {
           email: obj.email,
           address: pretty(getObject(obj.address_id, 'Address'), 'Address'),
           active: obj.active,
-          create_date: obj.create_date,
-          last_update: obj.last_update
+          create_date: obj.create_date.toLocaleString(),
+          last_update: obj.last_update.toLocaleString()
         },
         url: '/api/customers/' + obj._id
       };
