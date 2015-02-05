@@ -2,7 +2,7 @@
 var mongoose = require('mongoose'),
     Country = mongoose.model('Country');
 
-module.exports.getCountry = function(req, res, next) {
+exports.getCountry = function(req, res, next) {
   console.log(req.params.q);
   if (!(req.params.id === undefined ||
     req.params.id === '')) {
@@ -38,7 +38,7 @@ module.exports.getCountry = function(req, res, next) {
   }
 }
 
-module.exports.postCountry = function(req, res, next) {
+exports.postCountry = function(req, res, next) {
   var name = JSON.parse(req.body).name;
   if (!(name === undefined ||
     name === '')) {
