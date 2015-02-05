@@ -1,10 +1,11 @@
 var mongoose = require('mongoose'),
     default_limit = 10;
 
+// IMPORTANT: This method is finished. Don't fuck with it!
 exports.present = function (req, res, next) {
 
   if (req.params.pretty === true)
-    return respond(0, data, res);
+    return respond(0, req.params.data, res);
 
   // req.params.prev contains the name of Model we're looking up
   mongoose.model(req.params.prev)
