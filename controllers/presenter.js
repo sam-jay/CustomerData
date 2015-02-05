@@ -3,11 +3,11 @@ var mongoose = require('mongoose'),
 
 // IMPORTANT: This method is finished. Don't fuck with it!
 exports.present = function(req, res, next) {
+  var respond,
+      parseQuery,
+      parsed_query = { };
 
-  if (req.params.pretty === true)
-    return respond(0, [req.params.data], req.params.prev);
-
-  var parseQuery = function(str) {
+  parseQuery = function(str) {
     return JSON.parse('{ "$and": [' + str.split('&&').map(function(str) {
       return '{ "$or": [' + str.split('||').map(function(str) {
         return '{' + str.split('=').map(function(str) {
@@ -17,7 +17,7 @@ exports.present = function(req, res, next) {
     }).join(', ') + '] }');
   }
 
-  var parsed_query = { };
+  parsed_query = { };
   if (req.query.q !== undefined)
     try {
       parsed_query = parseQuery(req.query.q);
@@ -27,22 +27,8 @@ exports.present = function(req, res, next) {
       });
     }
 
-  // req.params.prev contains the name of Model we're looking up
-  mongoose.model(req.params.prev)
-  .find(parsed_query)
-  .select(req.query.fields !== undefined ? req.query.fields.replace(',', ' ') : { })
-  .skip(req.query.offset !== undefined ? req.query.offset : 0)
-  .limit(req.query.limit !== undefined ? req.query.limit : default_limit)
-  .exec(function (err, data) {
-    return respond(err, data, req.params.prev);
-  });
-
-  var respond = function(err, data, type) {
-    if (err)
-      return res.json(404, {
-        message: 'Resource not found'
-      });
-   
+  respond = function(err, data, type) {
+    console.log(req.params.data);
     var plural = {
       'Country': 'countries',
       'City': 'cities',
@@ -57,6 +43,13 @@ exports.present = function(req, res, next) {
       req.query.limit !== undefined ? 'limit=' + req.query.limit : ''
     ].filter(function(e) { return e !== ''; }).join('&');
 
+    if (err || data.length === 0)
+      return res.json(404, {
+        code: 'ResourceNotFound',
+        message: '/api/' + plural[type] + (query_url.length > 0 ? '?' + query_url : '') +
+          'does not exist'
+      });
+
     return res.json(200, {
       data: data.map(function(obj) {
         return pretty(obj, type);
@@ -64,6 +57,19 @@ exports.present = function(req, res, next) {
       url: '/api/' + plural[type] + (query_url.length > 0 ? '?' + query_url : '')
     });
   };
+
+  if (req.params.pretty === true) 
+    return respond(0, [req.params.data], req.params.prev);
+
+  // req.params.prev contains the name of Model we're looking up
+  mongoose.model(req.params.prev)
+  .find(parsed_query)
+  .select(req.query.fields !== undefined ? req.query.fields.replace(',', ' ') : { })
+  .skip(req.query.offset !== undefined ? req.query.offset : 0)
+  .limit(req.query.limit !== undefined ? req.query.limit : default_limit)
+  .exec(function (err, data) {
+    return respond(err, data, req.params.prev);
+  });
 
 };
 
