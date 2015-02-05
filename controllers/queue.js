@@ -7,7 +7,7 @@ var response = function(url, timeout, status) {
   this.status;
 }
 
-exports.start() {
+exports.start = function() {
   setInterval(function() {
     if (queue.length > 0) {
       // do stuff
