@@ -1,5 +1,5 @@
 
-exports.respond(code, res, msg) {
+exports.respond = function(code, res, msg) {
   switch (code) {
     case 400:
       return res.json(400, {
