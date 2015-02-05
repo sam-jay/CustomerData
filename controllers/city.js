@@ -2,86 +2,24 @@
 var mongoose = require('mongoose'),
     City = mongoose.model('City');
 
-exports.getCountry = function(req, res, next) {
-  console.log(req.params);
-}
-
+// IMPORTANT: This method is done. Don't fuck with it.
 exports.getCity = function(req, res, next) {
   req.params.prev = 'City';
-
-  // request passed through getAddress
-  if (req.params.prev !== undefined) {
-    var city = getCityFromDB(req.params.address.city_id);
-    if (city.hasOwnProperty('error'))
-      res.json(500, city)
-    req.params.city = city;
+  if (req.params.id !== undefined) {
+    mongoose.model('City').findById(req.params.id, function(err, data) {
+      if (err)
+        return res.json(404, {
+          message: 'Resource not found'
+        });
+      req.params.pretty = true;
+      req.params.data = data;
+      req.params.id = data.country_id;
+      return next();
+    });
+  } else
     return next();
-  }
+};
 
-  // request includes query
-  if (req.query.q !== undefined)
-    return next();
-
-  var getCityFromDB = function (arg) {
-    if (arg !== undefined) {
-      City.findById(arg, function(err, data) {
-        if (err)
-          return { error: "Error occured: " + err}
-        else return data;
-      });
-    }
-  };
-  
-  var city = getCityFromDB(req.params.id);
-  // if (city.hasOwnProperty('error'))
-  //   res.json(500, city)
-  req.params.city = city;
-  return next();
-
-  
-}
-
-
-
-
-//   console.log(req.params.q);
-//   if (!(req.params.id === undefined ||
-//     req.params.id === '')) {
-//     City.findById(req.params.id, function(err, data) {
-//       if (err) {
-//         res.json(500, {
-//           message: 'Error occured: ' + err
-//         });
-//       } else {
-//         res.json(200, {
-//           name: data.name,
-//           country: data.country,
-//           link: 'cities/' + data._id
-//         });
-//       }
-//     });
-//   } else {
-//     City.find({}, function(err, data) {
-//       if (err) {
-//         res.json(500, {
-//           message: 'Error occured: ' + err
-//         });
-//       } else {
-//         var i, results = [];
-//         for (i = 0; i < data.length; i++) {
-//           results[i] = {
-//             name: data[i].name,
-//             country: data[i].country,
-//             link: 'cities/' + data[i]._id
-//           };
-//         }
-//         res.json(200, results);
-//       }
-//     });
-//   }
-// }
-
-// need to account for bad fields?
 exports.postCity = function(req, res, next) {
   var name = JSON.parse(req.body).name;
   var countryID = JSON.parse(req.body).country;
