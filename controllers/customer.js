@@ -1,4 +1,4 @@
-// Dependencies
+restify// Dependencies
 var mongoose = require('mongoose'),
     Customer = mongoose.model('Customer');
 
@@ -10,22 +10,21 @@ exports.getCustomer = function(req, res, next) {
     return next();
 
   var customer = getCustomerFromDB(req.params.id);
+  if (customer.hasOwnProperty('error')) 
+  	res.json(500, customer)
   req.params.customer = customer;
   return next();
 
-  var getCustomerFromDB(arg) {
-    if (arg === undefined) {
-      Customer.find({}, function(err, data) {
-        // TODO
-        return all customers
-      });
-    } else {
+  var getCustomerFromDB = function (arg) {
+    if (arg !== undefined) {
       Customer.findById(arg, function(err, data) {
-        return one customer
+      	if (err)
+      		return { error: "Error occured: " + err }
+      	else return data;
       });
     }
   };
-
+}
   /*
   console.log(req.params);
 	if (!(req.params.id === undefined ||
