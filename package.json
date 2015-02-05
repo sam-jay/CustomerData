@@ -19,6 +19,7 @@
   "dependencies": {
     "body-parser": "^1.11.0",
     "mongoose": "^3.8.22",
-    "restify": "^2.8.5"
+    "restify": "^2.8.5",
+    "validator": "^3.28.0"
   }
 }

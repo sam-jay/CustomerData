@@ -1,4 +1,5 @@
 var mongoose = require('mongoose'),
+    validator = require('validator'),
     Country = mongoose.model('Country');
 
 // IMPORTANT: Don't fuck with this method. Everything is finished here.
@@ -18,14 +19,23 @@ exports.getCountry = function(req, res, next) {
     return next();
 };
 
-// TODO: validation. Everything else working.
 exports.postCountry = function(req, res, next) {
-  var err = false, 
-      country_name = JSON.parse(req.body).country;
-  if (err)
-    return res.json(500, {
-      message: 'Internal Server Error'
+  var country_name;
+  
+  try {
+    country_name = JSON.parse(req.body).country;
+  } catch (e) {
+    return res.json(400, {
+      message: 'Invalid parameter' 
     });
+  }
+
+  if (validator.isNull(country_name)) {
+    return res.json(400, {
+      message: 'Invalid parameter'
+    });
+  }
+  
   var country = new Country();
   country._id = mongoose.Types.ObjectId();
   country.country = country_name;
