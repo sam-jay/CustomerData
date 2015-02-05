@@ -9,9 +9,22 @@ module.exports.getCustomer = function(req, res, next) {
   if (req.query.q !== undefined)
     return next();
 
-  var customer = getCustomerFromDB();
+  var customer = getCustomerFromDB(req.params.id);
   req.params.customer = customer;
   return next();
+
+  var getCustomerFromDB(arg) {
+    if (arg === undefined) {
+      Customer.find({}, function(err, data) {
+        // TODO
+        return all customers
+      });
+    } else {
+      Customer.findById(arg, function(err, data) {
+        return one customer
+      });
+    }
+  };
 
   /*
   console.log(req.params);
