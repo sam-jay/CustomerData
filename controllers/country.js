@@ -2,7 +2,7 @@
 var mongoose = require('mongoose'),
     Country = mongoose.model('Country');
 
-exports.getCountry = function(req, res, next) {
+module.exports.getCountry = function(req, res, next) {
   console.log(req.params.q);
   if (!(req.params.id === undefined ||
     req.params.id === '')) {
@@ -38,11 +38,13 @@ exports.getCountry = function(req, res, next) {
   }
 }
 
-exports.postCountry = function(req, res, next) {
+module.exports.postCountry = function(req, res, next) {
   var name = JSON.parse(req.body).name;
   if (!(name === undefined ||
     name === '')) {
     var country = new Country();
+    country._id = mongoose.Types.ObjectId();
+    console.log(country._id);
     country.name = name;
     country.last_update = new Date();
     country.save(function () {

@@ -2,8 +2,19 @@
 var mongoose = require('mongoose'),
     Customer = mongoose.model('Customer');
 
-exports.getCustomer = function(req, res, next) {
-	console.log(req.params);
+module.exports.getCustomer = function(req, res, next) {
+  req.params.prev = 'Customer';
+
+  // If query go to next
+  if (req.query.q !== undefined)
+    return next();
+
+  var customer = getCustomerFromDB();
+  req.params.customer = customer;
+  return next();
+
+  /*
+  console.log(req.params);
 	if (!(req.params.id === undefined ||
     req.params.id === '')) {
 		Customer.findById(req.params.id, function(err, data) {
@@ -38,6 +49,7 @@ exports.getCustomer = function(req, res, next) {
     		}
     	});
     }
+*/
 }
 
 exports.postCustomer = function(req, res, next) {
