@@ -3,6 +3,9 @@ var mongoose = require('mongoose'),
 
 exports.present = function (req, res, next) {
 
+  if (req.params.pretty === true)
+    return respond(0, data, res);
+
   // req.params.prev contains the name of Model we're looking up
   mongoose.model(req.params.prev)
   .find(req.query.q !== undefined ? parseQuery(req.query.q) : { })
