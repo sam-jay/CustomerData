@@ -2,11 +2,10 @@ var mongoose = require('mongoose'),
     default_limit = 10;
 
 exports.present = function (req, res, next) {
-  console.log(req.params);
-}
-/*exports.present = function (req, res, next) {
 
-  var query, pagination, projection;
+  var query = { },
+      pagination = { skip: 0, limit: default_limit },
+      fields = { };
 
   if (req.query.q !== undefined)
     query = parseQuery(req.query.q);
@@ -15,26 +14,42 @@ exports.present = function (req, res, next) {
     pagination = parseLimitOffset(req.query);
 
   if (req.query.fields !== undefined)
-    projection = parseFields(req.query.fields);
+    fields = parseFields(req.query.fields);
+
+  var Resource = mongoose.model(req.prev);
+  Resource
+  .find(query)
+  .select(fields)
+  .skip(pagination.skip)
+  .limit(pagination.limit)
+  .exec(function (err, data) {
+    if (err)
+      return res.json(404, {  
+        message: 'Resource not found'
+      });
+    /// VVVVVVVVVVVVVV
+    return res.json(data);
+  });
 
 };
 
 var parseQuery = function (q) {
-  return q.split('&&').map(function (str) {
-    return str.split('||').map(function (str2) {
-      return str2.split('=');
-    });
-  });
+  return JSON.parse('{ "$and": [' + q.split('&&').map(function (str) {
+    return '{ "$or": [' + str.split('||').map(function (str) {
+      return '{' + str.split('=').map(function (str) {
+        return '"' + str + '"';
+      }).join(': ') + '}';
+    }).join(', ') + '] }';
+  }).join(', ') + '] }');
 }
 
 var parseLimitOffset = function (q) {
   return {
-    'limit': q.limit,
-    'offset': q.offset
+    skip: q.offset,
+    limit: q.limit
   };
 }
 
 var parseFields = function (fields) {
-  return fields.split(',');
+  return fields.replace(',', ' ');
 }
-*/
