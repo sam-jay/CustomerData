@@ -1,6 +1,7 @@
 var mongoose = require('mongoose'),
     validator = require('validator'),
-    Country = mongoose.model('Country');
+    Country = mongoose.model('Country'),
+    error = require('./error.js');
 
 // IMPORTANT: Don't fuck with this method. Everything is finished here.
 exports.getCountry = function(req, res, next) {
@@ -8,9 +9,7 @@ exports.getCountry = function(req, res, next) {
   if (req.params.id !== undefined) {
     Country.findById(req.params.id, function(err, data) {
       if (err)
-        return res.json(404, {
-          message: 'Resource not found'
-        });
+        return error.respond(404, res, '/api/countries/' + req.params.id);
       req.params.pretty = true;
       req.params.data = data;
       return next();
@@ -22,19 +21,14 @@ exports.getCountry = function(req, res, next) {
 exports.postCountry = function(req, res, next) {
   var country_name;
   
-  try {
+  try { 
     country_name = JSON.parse(req.body).country;
-  } catch (e) {
-    return res.json(400, {
-      message: 'Invalid parameter' 
-    });
+  } catch (e) { 
+    return error.respond(400, res, 'Cannot parse input');
   }
 
-  if (validator.isNull(country_name)) {
-    return res.json(400, {
-      message: 'Invalid parameter'
-    });
-  }
+  if (validator.isNull(country_name)) 
+    return error.respond(400, res, 'Cannot parse input'); 
   
   var country = new Country();
   country._id = mongoose.Types.ObjectId();
@@ -49,26 +43,20 @@ exports.postCountry = function(req, res, next) {
 
 exports.putCountry = function(req, res, next) {
   var country_name;
- 
-  try {
+
+  try { 
     country_name = JSON.parse(req.body).country;
-  } catch (e) {
-    return res.json(400, {
-      message: 'Invalid parameter' 
-    });
+  } catch (e) { 
+    return error.respond(400, res, 'Cannot parse input');
   }
 
-  if (validator.isNull(country_name)) {
-    return res.json(400, {
-      message: 'Invalid parameter'
-    });
-  }
-  
+  if (validator.isNull(country_name)) 
+    return error.respond(400, res, 'Cannot parse input'); 
+
   Country.findById(req.params.id, function(err, data) {
     if (err)
-      return res.json(404, {
-        message: 'Resource not found'
-      });
+      return error.respond(404, res, req.params.id);
+    
     data.country = country_name;
     data.last_update = new Date();
     res.json(202, {
