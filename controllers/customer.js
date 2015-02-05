@@ -2,7 +2,7 @@
 var mongoose = require('mongoose'),
     Customer = mongoose.model('Customer');
 
-module.exports.getCustomer = function(req, res, next) {
+exports.getCustomer = function(req, res, next) {
   req.params.prev = 'Customer';
 
   // If query go to next

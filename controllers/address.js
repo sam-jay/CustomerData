@@ -1,7 +1,7 @@
 var mongoose = require('mongoose'),
     Address = mongoose.model('Address');
 
-module.exports.getAddress = function (req, res, next) {
+exports.getAddress = function (req, res, next) {
   req.params.prev = 'Address';
 
   // If request passed through getCustomer
