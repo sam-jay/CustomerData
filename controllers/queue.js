@@ -30,10 +30,10 @@ exports.push = function(response) {
 	queue.push(response);
 };
 
-exports.update = function(id, url) {
+exports.update = function(id, status, url) {
 	queue.forEach(function(response) {
 		if (response._id === id) {
-			response.status = 'updated';
+			response.status = status;
 			response.link = url;
 		}
 	});

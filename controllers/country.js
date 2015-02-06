@@ -30,7 +30,7 @@ exports.postCountry = function(req, res, next) {
     country.last_update = new Date();
     country.save();
     var url = '/api/countries/' + country._id;
-    return next(id, url); 
+    return next(id, 'updated', url); 
   }
   
   try { 
@@ -60,6 +60,7 @@ exports.postCountry = function(req, res, next) {
 
 exports.putCountry = function(req, res, next) {
   var country_name;
+  var q_id;
 
   try { 
     country_name = JSON.parse(req.body).country;
@@ -70,22 +71,34 @@ exports.putCountry = function(req, res, next) {
   if (validator.isNull(country_name)) 
     return error.respond(400, res, 'Cannot parse input'); 
 
+  var editCountry = function(id, next) {
+    Country.findById(req.params.id, function(err, data) {
+      if (err)
+        return next(id, 'failed', '');
+      
+      data.country = country_name;
+      data.last_update = new Date();
+      data.save(); // from country.save();
+      var url = '/api/countries/' + country._id;
+      return next(id, 'updated', url);
+    });  
+  }
+
+  q_id = mongoose.Types.ObjectId();
+
+  queue.push({
+    status: 'pending',
+    _id: q_id
+  })
+
   res.json(202, {
-    message: ''
+    message: 'Resource accepted (Operation Pending)',
+    url: '/api/queuedRequests/' + q_id
   });
 
-  Country.findById(req.params.id, function(err, data) {
-    if (err)
-      return error.respond(404, res, req.params.id);
-    
-    data.country = country_name;
-    data.last_update = new Date();
-    res.json(202, {
-      message: 'Accepted (Operation Pending)',
-      url: '/api/countries/' + data._id
-    });
-    return country.save();
-  });
+  return editCountry(q_id, queue.update);
+
+  
 }
 
 exports.delCountry = function(req, res, next) {
