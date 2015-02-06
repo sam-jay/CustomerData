@@ -1,6 +1,7 @@
 var mongoose = require('mongoose'),
     validator = require('validator'),
     Country = mongoose.model('Country'),
+    queue = require('./queue.js'),
     error = require('./error.js');
 
 // IMPORTANT: Don't fuck with this method. Everything is finished here.
@@ -20,6 +21,17 @@ exports.getCountry = function(req, res, next) {
 
 exports.postCountry = function(req, res, next) {
   var country_name;
+  var q_id;
+
+  var saveCountry = function (id, next) {
+    var country = new Country();
+    country._id = mongoose.Types.ObjectId();
+    country.country = country_name;
+    country.last_update = new Date();
+    country.save();
+    var url = '/api/countries/' + country._id;
+    return next(id, url); 
+  }
   
   try { 
     country_name = JSON.parse(req.body).country;
@@ -29,16 +41,21 @@ exports.postCountry = function(req, res, next) {
 
   if (validator.isNull(country_name)) 
     return error.respond(400, res, 'Cannot parse input'); 
-  
-  var country = new Country();
-  country._id = mongoose.Types.ObjectId();
-  country.country = country_name;
-  country.last_update = new Date();
+
+  q_id = mongoose.Types.ObjectId();
+
+  queue.push({
+    status: 'pending',
+    _id: q_id
+  })
+
   res.json(202, {
     message: 'Resource accepted (Operation Pending)',
-    url: '/api/countries/' + country._id
+    url: '/api/queuedRequests/' + q_id
   });
-  country.save();
+
+  return saveCountry(q_id, queue.update);
+
 }
 
 exports.putCountry = function(req, res, next) {

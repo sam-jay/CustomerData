@@ -29,6 +29,9 @@ server.use(restify.fullResponse());
 server.use(restify.bodyParser());
 server.use(restify.queryParser());
 
+// Queued requests
+server.get('/api/queuedRequests/:id', controllers.queue.getStatus);
+
 // Country requests
 server.get('/api/countries', controllers.country.getCountry, controllers.presenter.present);
 server.get('/api/countries/:id', controllers.country.getCountry, controllers.presenter.present);
