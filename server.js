@@ -30,14 +30,14 @@ server.use(restify.bodyParser());
 server.use(restify.queryParser());
 
 // Queued requests
-server.get('/api/queuedRequests/:id', controllers.queue.getStatus);
+server.get('/api/queued_requests/:id', controllers.queue.getQueuedRequest);
 
 // Country requests
 server.get('/api/countries', controllers.country.getCountry, controllers.presenter.present);
 server.get('/api/countries/:id', controllers.country.getCountry, controllers.presenter.present);
 server.post('/api/countries', controllers.country.postCountry);
 server.put('/api/countries/:id', controllers.country.putCountry);
-//server.del('/api/countries/:id', controllers.country.delCountry);
+server.del('/api/countries/:id', controllers.country.delCountry);
 
 /*
 // City requests
