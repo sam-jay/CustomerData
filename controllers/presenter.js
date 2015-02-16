@@ -1,52 +1,25 @@
 var mongoose = require('mongoose'),
-    default_limit = 10;
+    default_limit = 10; // Default page limit
 
-// IMPORTANT: This method is finished. Don't fuck with it!
 exports.present = function(req, res, next) {
   var respond,
-      parseQuery,
       parsed_query = { };
-
-  parseQuery = function(str) {
-    return JSON.parse('{ "$and": [' + str.split('&&').map(function(str) {
-      return '{ "$or": [' + str.split('||').map(function(str) {
-        return '{' + str.split('=').map(function(str) {
-          return '"' + str + '"';
-        }).join(': ') + '}';
-      }).join(', ') + '] }';
-    }).join(', ') + '] }');
-  }
 
   parsed_query = { };
   if (req.query.q !== undefined)
     try {
       parsed_query = parseQuery(req.query.q);
     } catch (e) {
-      return res.json(400, {
+      return res.json(400, { // Change to error handler
         message: 'Invalid parameter'
       });
     }
 
   respond = function(err, data, type) {
-    
-    var plural = {
-      'Country': 'countries',
-      'City': 'cities',
-      'Address': 'addresses',
-      'Customer': 'customers'
-    };
-    
-    var query_url = [
-      req.query.q !== undefined ? 'q=' + req.query.q : '',
-      req.query.fields !== undefined ? 'fields=' + req.query.fields : '',
-      req.query.offset !== undefined ? 'offset=' + req.query.offset : '',
-      req.query.limit !== undefined ? 'limit=' + req.query.limit : ''
-    ].filter(function(e) { return e !== ''; }).join('&');
-
     if (err || data.length === 0)
       return res.json(404, {
         code: 'ResourceNotFound',
-        message: '/api/' + plural[type] + (query_url.length > 0 ? '?' + query_url : '') +
+        message: getUrl(req.query, type) +
           'does not exist'
       });
 
@@ -54,11 +27,11 @@ exports.present = function(req, res, next) {
       data: data.map(function(obj) {
         return pretty(obj, type);
       }),
-      url: '/api/' + plural[type] + (query_url.length > 0 ? '?' + query_url : '')
+      url: getUrl(req.query, type)
     });
   };
-
-  if (req.params.pretty === true) 
+  
+  if (req.params.pretty)
     return respond(0, [req.params.data], req.params.prev);
 
   // req.params.prev contains the name of Model we're looking up
@@ -72,6 +45,35 @@ exports.present = function(req, res, next) {
   });
 
 };
+
+var parseQuery = function(str) {
+  return JSON.parse('{ "$and": [' + str.split('&&').map(function(str) {
+    return '{ "$or": [' + str.split('||').map(function(str) {
+      return '{' + str.split('=').map(function(str) {
+        return '"' + str + '"';
+      }).join(': ') + '}';
+    }).join(', ') + '] }';
+  }).join(', ') + '] }');
+}
+
+var getUrl = function (query, type) {
+
+  var plural = {
+    'Country': 'countries',
+    'City': 'cities',
+    'Address': 'addresses',
+    'Customer': 'customers'
+  };
+
+  var query_url = [
+  query.q !== undefined ? 'q=' + query.q : '',
+  query.fields !== undefined ? 'fields=' + query.fields : '',
+  query.offset !== undefined ? 'offset=' + query.offset : '',
+  query.limit !== undefined ? 'limit=' + query.limit : ''
+  ].filter(function(e) { return e !== ''; }).join('&');
+
+  return '/api/' + plural[type] + (query_url.length > 0 ? '?' + query_url : '');
+}
 
 var getObject = function(id, type) {
   return mongoose.model(type).findById(id, function(err, data) {
