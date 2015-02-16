@@ -20,25 +20,25 @@ exports.respond = function(code, res, msg) {
       });
       break;
     case 404:
-      return res.json(403, {
+      return res.json(404, {
         code: 'ResourceNotFound',
-        message: msg
+        message: msg + ' does not exist'
       });
       break;
     case 405:
-      return res.json(404, {
+      return res.json(405, {
         code: 'InvalidRequestMethod',
         message: msg
       });
       break;
     case 500:
-      return res.json(404, {
+      return res.json(500, {
         code: 'InternalServerError',
         message: msg
       });
       break;
     case 503:
-      return res.json(404, {
+      return res.json(503, {
         code: 'ServiceUnavailable',
         message: msg
       });
