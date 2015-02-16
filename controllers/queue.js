@@ -1,40 +1,54 @@
-var queue = [ ],
-	error = require('./error.js');
+(function() {
+	'use strict';
 
-// var response = function(url, timeout, status) {
-//   this.id;
-//   this.timeout;
-//   this.status;
-// }
+	var mongoose = require('mongoose'),
+		queue = { },
+		error = require('./error.js');
 
-exports.start = function() {
-  setInterval(function() {
-    if (queue.length > 0) {
-      // do stuff
-    }
-  }, 1000);
-};
+	var Request = function(timeout) {
+		this.timeout = timeout;
+		this._id = mongoose.Types.ObjectId();
+		this.status = 'Pending';
+		this.resource = '';
+		this.created = Date.now();
 
-exports.getStatus = function(req, res, next) {
-	var q_id = req.params.id;
-
-	for (var i = 0; i < queue.length; i++) {
-		if (queue[i]._id == q_id)
-			res.json(200, queue[i]);
-	}
-
-	error.respond(404, res, 'Resource not found');
-}
-
-exports.push = function(response) {
-	queue.push(response);
-};
-
-exports.update = function(id, status, url) {
-	queue.forEach(function(response) {
-		if (response._id === id) {
-			response.status = status;
-			response.link = url;
+		var _this = this;
+		this.setStatus = function(status) {
+			_this.status = status;
+		};
+		this.setResource = function(resource) {
+			_this.resource = resource;
 		}
-	});
-};
+	};
+
+	exports.start = function() {
+		setInterval(function() {
+			if (queue.length > 0) {
+      			// do cleanup stuff
+  			}
+		}, 1000);
+	};
+
+	exports.push = function(timeout) {
+		var request = new Request(timeout);
+		queue[request._id] = request;
+		return request;
+	};
+
+	exports.getQueuedRequest = function(req, res, next) {
+		if (queue[req.params.id] === undefined) {
+			return error.respond(404, res, '/api/queued_requests/'
+				+ req.params.id);
+		} else {
+			var request = queue[req.params.id];
+			return res.json({
+				data: {
+					status: request.status,
+					resource: request.resource
+				},
+				url: '/api/queued_requests/' + req.params.id
+			});
+		}
+	};
+
+})();
