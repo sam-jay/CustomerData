@@ -12,7 +12,7 @@
     req.params.prev = 'Country';
 
     /* If ID is given, find country */
-    if (req.params.id !== undefined) {
+    if (!validator.isNull(req.params.id)) {
       Country.findById(req.params.id, function(err, data) {
         if (err)
           return error.respond(404, res, '/api/countries/' + req.params.id);
@@ -32,13 +32,9 @@
         queued_request;
 
     /* Attempt to get country name from request body */
-    try { 
-      country_name = JSON.parse(req.body).country;
-    } catch (e) { 
-      return error.respond(400, res, 'Cannot parse input');
-    }
-    if (validator.isNull(country_name)) 
-      return error.respond(400, res, 'Cannot parse input'); 
+    country_name = req.body.country;
+    if (validator.isNull(country_name))
+      return error.respond(400, res, 'Cannot find country name'); 
 
     /* Add this request to the queue */
     queued_request = queue.push(10000);
@@ -65,13 +61,9 @@
         queued_request;
 
     /* Only country name may be updated */
-    try { 
-      country_name = JSON.parse(req.body).country;
-    } catch (e) { 
-      return error.respond(400, res, 'Cannot parse input');
-    }
-    if (validator.isNull(country_name)) 
-      return error.respond(400, res, 'Cannot parse input'); 
+    country_name = req.body.country;
+    if (validator.isNull(country_name))
+      return error.respond(400, res, 'Cannot find country name'); 
  
     /* Find country */
     Country.findById(req.params.id, function(err, data) {
@@ -87,7 +79,7 @@
         url: '/api/queued_requests/' + queued_request._id
       });
 
-      /* Update country */
+      /* Update country name */
       data.country = country_name;
       data.last_update = new Date();
       data.save(function (err, country) {
@@ -121,7 +113,8 @@
     }).remove(function(err) {
       if (err)
         return queued_request.setStatus('Failed');
-
+      
+      /* Successfully removed */
       return queued_request.setStatus('Success');
     });
   }
