@@ -42,6 +42,10 @@
     }
     if (validator.isNull(city_name) ||  validator.isNull(country_ID))
       return error.respond(400, res, 'Cannot parse input'); 
+     Country.findById(country_ID, function(err, data) {
+        if (err)
+          return error.respond(404, res, '/api/countries/' + country_ID);
+      });
     // look for country ID
       //country does not exit - respond with error messaage
     /* Add this request to the queue */
