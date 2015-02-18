@@ -1,4 +1,5 @@
 var mongoose = require('mongoose'),
+    async = require('async'),
     default_limit = 10; // Default page limit
 
 exports.present = function(req, res, next) {
@@ -23,11 +24,16 @@ exports.present = function(req, res, next) {
           'does not exist'
       });
 
-    return res.json(200, {
-      data: data.map(function(obj) {
-        return pretty(obj, type);
-      }),
-      url: getUrl(req.query, type)
+    /* Begin callback hell */
+    async.map(data, function(obj, callback) {
+      pretty(obj, type, function(data) {
+        callback(null, data);
+      });
+    }, function(err, result) {
+      return res.json(200, {
+        data: result,
+        url: getUrl(req.query, type)
+      })
     });
   };
   
@@ -75,18 +81,18 @@ var getUrl = function (query, type) {
   return '/api/' + plural[type] + (query_url.length > 0 ? '?' + query_url : '');
 }
 
-var getObject = function(id, type) {
-  return mongoose.model(type).findById(id, function(err, data) {
-    return data; 
+var getObject = function(id, type, callback) {
+  mongoose.model(type).findById(id, function(err, data) {
+    return callback(data);
   });
 }
 
-var pretty = function(obj, type) {
+var _pretty = function(obj, type) {
   switch (type) {
     case 'Country':
       return {  
         data: { 
-          country: obj.country, 
+          country: obj.country,
           last_update: obj.last_update.toLocaleString() 
         },
         url: '/api/countries/' + obj._id
@@ -96,7 +102,7 @@ var pretty = function(obj, type) {
       return {
         data: { 
           city: obj.city, 
-          country: pretty(getObject(obj.country_id, 'Country'), 'Country'), 
+          country: obj.countryObj, 
           last_update: obj.last_update.toLocaleString()
         },
         url: '/api/cities/' + obj._id
@@ -107,7 +113,7 @@ var pretty = function(obj, type) {
         data: {
           address: { line1: obj.address, line2: obj.address2 },
           district: obj.district,
-          city: pretty(getObject(obj.city_id, 'City'), 'City'),
+          city: obj.cityObj,
           postal_code: obj.postal_code,
           phone: obj.postal_code,
           last_update: obj.last_update.toLocaleString()
@@ -120,7 +126,7 @@ var pretty = function(obj, type) {
         data: {
           name: { first: obj.first_name, last: obj.last_name },
           email: obj.email,
-          address: pretty(getObject(obj.address_id, 'Address'), 'Address'),
+          address: obj.addressObj,
           active: obj.active,
           create_date: obj.create_date.toLocaleString(),
           last_update: obj.last_update.toLocaleString()
@@ -128,6 +134,40 @@ var pretty = function(obj, type) {
         url: '/api/customers/' + obj._id
       };
       break;
-  };
+  }
 };
 
+var pretty = function(obj, type, callback) {
+  switch (type) {
+    case 'Country':
+      return callback(_pretty(obj, type));
+      break;
+    case 'City':
+      getObject(obj.country_id, 'Country', function(country) {
+        obj.countryObj = _pretty(country, 'Country');
+        return callback(_pretty(obj, 'City'));
+      });
+      break;
+    case 'Address':
+      getObject(obj.city_id, 'City', function(city) {
+        getObject(city.country_id, 'Country', function(country) {
+          city.countryObj = _pretty(country, 'Country');
+          obj.cityObj = _pretty(city, 'City');
+          return callback(_pretty(obj, 'Address'));
+        })
+      });
+      break;
+    case 'Customer':
+      getObject(obj.address_id, 'Address', function(address) {
+        getObject(address.city_id, 'City', function(city) {
+          getObject(city.country_id, 'Country', function(country) {
+            city.countryObj = _pretty(country, 'Country');
+            address.cityObj = _pretty(city, 'City');
+            obj.addressObj = _pretty(address, 'Address');
+            return callback(_pretty(obj, 'Customer'));
+          })
+        })
+      });
+      break;
+  };
+};
