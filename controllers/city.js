@@ -30,19 +30,20 @@
 
   exports.postCity = function(req, res, next) {
     var city_name,
-        country_id,
+        country_ID,
         queued_request;
 
     /* Attempt to get country name from request body */
     try { 
       city_name = JSON.parse(req.body).city;
-      country_id = JSON.parse(req.body).country_id;
+      country_ID = JSON.parse(req.body).country_id;
     } catch (e) { 
       return error.respond(400, res, 'Cannot parse input');
     }
-    if (validator.isNull(city_name) ||  validator.isNull(country_id))
+    if (validator.isNull(city_name) ||  validator.isNull(country_ID))
       return error.respond(400, res, 'Cannot parse input'); 
-
+    // look for country ID
+      //country does not exit - respond with error messaage
     /* Add this request to the queue */
     queued_request = queue.push(10000);
     res.json(202, {
@@ -53,7 +54,7 @@
         /* Save new country */
     var city = new City();
     city.city = city_name;
-    city.country = country_id;
+    city.country_id = country_ID;
     city.save(function(err, city) {
       if (err)
         return queued_request.setStatus('Failed');
