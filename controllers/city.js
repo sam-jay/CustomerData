@@ -115,6 +115,32 @@
     });
   }
 
+  // 
+  exports.delCity = function(req, res, next) {
+    var queued_request;
+
+    /* Find country */
+    City.findById(req.params.id, function(err, data) {
+
+      /* Country not found */
+      if (err)
+        return error.respond(404, res, '/api/cities/' + req.params.id);
+
+      /* If found, add this request to the queue */
+      queued_request = queue.push(10000);
+      res.json(202, {
+        message: 'Resource accepted (Operation Pending)',
+        url: '/api/queued_requests/' + queued_request._id
+      });
+
+    }).remove(function(err) {
+      if (err)
+        return queued_request.setStatus('Failed');
+
+      return queued_request.setStatus('Success');
+    });
+  }
+
 })();
 
 // // Dependencies
