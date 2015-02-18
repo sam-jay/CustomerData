@@ -10,7 +10,7 @@ exports.present = function(req, res, next) {
   parsed_query = { };
   if (req.query.q !== undefined)
     try {
-      parsed_query = parseQuery(req.query.q);
+      parsed_query = parseQuery(req.query.q.substring(1, req.query.q.length - 1));
     } catch (e) {
       return error.respond(400, res, 'Invalid query');
     }
@@ -52,7 +52,7 @@ exports.present = function(req, res, next) {
 };
 
 var parseQuery = function(str) {
-  return JSON.parse('{ "$and": [' + str.split('&&').map(function(str) {
+  return JSON.parse('{ "$and": [' + str.split('&').map(function(str) {
     return '{ "$or": [' + str.split('||').map(function(str) {
       return '{' + str.split('=').map(function(str) {
         return '"' + str + '"';
