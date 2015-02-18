@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
     async = require('async'),
+    error = require('./error.js'),
     default_limit = 10; // Default page limit
 
 exports.present = function(req, res, next) {
@@ -11,9 +12,7 @@ exports.present = function(req, res, next) {
     try {
       parsed_query = parseQuery(req.query.q);
     } catch (e) {
-      return res.json(400, { // Change to error handler
-        message: 'Invalid parameter'
-      });
+      return error.respond(400, res, 'Invalid query');
     }
 
   respond = function(err, data, type) {
