@@ -5,7 +5,7 @@
   var mongoose = require('mongoose'),
       validator = require('validator'),
       Country = mongoose.model('Country'),
-      City = mongoose.model('City')
+      City = mongoose.model('City'),
       queue = require('./queue.js'),
       error = require('./error.js');
 
@@ -27,6 +27,42 @@
       return next();
     }
   };
+
+  exports.postCity = function(req, res, next) {
+    var city_name,
+        country_id,
+        queued_request;
+
+    /* Attempt to get country name from request body */
+    try { 
+      city_name = JSON.parse(req.body).city;
+      country_id = JSON.parse(req.body).country_id;
+    } catch (e) { 
+      return error.respond(400, res, 'Cannot parse input');
+    }
+    if (validator.isNull(city_name) ||  validator.isNull(country_id))
+      return error.respond(400, res, 'Cannot parse input'); 
+
+    /* Add this request to the queue */
+    queued_request = queue.push(10000);
+    res.json(202, {
+      message: 'Resource accepted (Operation Pending)',
+      url: '/api/queued_requests/' + queued_request._id
+    });
+
+        /* Save new country */
+    var city = new City();
+    city.city = city_name;
+    city.country = country_id;
+    city.save(function(err, city) {
+      if (err)
+        return queued_request.setStatus('Failed');
+
+      queued_request.setStatus('Success');
+      return queued_request.setResource('/api/cities/' 
+        + city._id);
+    });
+  }
 
 })();
 
