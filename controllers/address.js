@@ -18,6 +18,7 @@
           return error.respond(404, res, '/api/addresses/' + req.params.id);
         req.params.pretty = 'true';
         req.params.data = data;
+        req.params.id = data.city_id;
         return next();
       });
 
