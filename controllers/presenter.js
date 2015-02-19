@@ -1,6 +1,7 @@
 var mongoose = require('mongoose'),
     async = require('async'),
     error = require('./error.js'),
+    validator = require('validator'),
     default_limit = 10; // Default page limit
 
 exports.present = function(req, res, next) {
@@ -23,8 +24,9 @@ exports.present = function(req, res, next) {
           'does not exist'
       });
 
-    /* Begin callback hell */
     async.map(data, function(obj, callback) {
+      if (!validator.isNull(req.query.fields))
+        obj.fields = req.query.fields.toLowerCase().split(',');
       pretty(obj, type, function(data) {
         callback(null, data);
       });
@@ -42,7 +44,6 @@ exports.present = function(req, res, next) {
   // req.params.prev contains the name of Model we're looking up
   mongoose.model(req.params.prev)
   .find(parsed_query)
-  .select(req.query.fields !== undefined ? req.query.fields.replace(',', ' ') : { })
   .skip(req.query.offset !== undefined ? req.query.offset : 0)
   .limit(req.query.limit !== undefined ? req.query.limit : default_limit)
   .exec(function (err, data) {
@@ -86,52 +87,97 @@ var getObject = function(id, type, callback) {
   });
 }
 
+Array.prototype.contains = function(element) {
+  return this.indexOf(element) > -1;
+};
+
 var _pretty = function(obj, type) {
   switch (type) {
+
     case 'Country':
-      return {  
-        data: { 
-          country: obj.country,
-          last_update: obj.last_update.toLocaleString() 
-        },
+
+      var country = {
+        data: {},
         url: '/api/countries/' + obj._id
       };
+
+      if (validator.isNull(obj.fields) || obj.fields.contains('country'))
+        country.data.country = obj.country;
+      if (validator.isNull(obj.fields) || obj.fields.contains('last_update'))
+        country.data.last_update = obj.last_update;
+
+      return country;
       break;
+
     case 'City':
-      return {
-        data: { 
-          city: obj.city, 
-          country: obj.countryObj, 
-          last_update: obj.last_update.toLocaleString()
-        },
+
+      var city = {
+        data: {},
         url: '/api/cities/' + obj._id
       };
+
+      if (validator.isNull(obj.fields) || obj.fields.contains('city'))
+        city.data.city = obj.city;
+      if (validator.isNull(obj.fields) || obj.fields.contains('country'))
+        city.data.country = obj.countryObj;
+      if (validator.isNull(obj.fields) || obj.fields.contains('last_update'))
+        city.data.last_update = obj.last_update.toLocaleString();
+
+      return city;
       break;
+
     case 'Address':
-      return {
-        data: {
-          address: { line1: obj.address, line2: obj.address2 },
-          district: obj.district,
-          city: obj.cityObj,
-          postal_code: obj.postal_code,
-          phone: obj.postal_code,
-          last_update: obj.last_update.toLocaleString()
-        },
+
+      var address = {
+        data: {},
         url: '/api/addresses/' + obj._id
       };
+
+      if (validator.isNull(obj.fields) || obj.fields.contains('address'))
+        address.data.address = { line1: obj.address, line2: obj.address2 };
+      else if (validator.isNull(obj.fields) || obj.fields.contains('address.line1'))
+        address.data.address = { line1: obj.address };
+      else if (validator.isNull(obj.fields) || obj.fields.contains('address.line2'))
+        address.data.address = { line2: obj.address2 };
+      if (validator.isNull(obj.fields) || obj.fields.contains('district'))
+        address.data.district = obj.district;
+      if (validator.isNull(obj.fields) || obj.fields.contains('city'))
+        address.data.city = obj.cityObj;
+      if (validator.isNull(obj.fields) || obj.fields.contains('postal_code'))
+        address.data.postal_code = obj.postal_code;
+      if (validator.isNull(obj.fields) || obj.fields.contains('phone'))
+        address.data.phone = obj.phone;
+      if (validator.isNull(obj.fields) || obj.fields.contains('last_update'))
+        address.data.last_update = obj.last_update.toLocaleString();
+
+      return address;
       break;
+
     case 'Customer':
-      return {
-        data: {
-          name: { first: obj.first_name, last: obj.last_name },
-          email: obj.email,
-          address: obj.addressObj,
-          active: obj.active,
-          create_date: obj.create_date.toLocaleString(),
-          last_update: obj.last_update.toLocaleString()
-        },
+
+      var customer = {
+        data: {},
         url: '/api/customers/' + obj._id
       };
+
+      if (validator.isNull(obj.fields) || obj.fields.contains('name'))
+        customer.data.name = { first: obj.first_name, last: obj.last_name };
+      else if (validator.isNull(obj.fields) || obj.fields.contains('name.first'))
+        customer.data.name = { first: obj.first_name };
+      else if (validator.isNull(obj.fields) || obj.fields.contains('name.last'))
+        customer.data.name = { last: obj.last_name };
+      if (validator.isNull(obj.fields) || obj.fields.contains('email'))
+        customer.data.email = obj.email;
+      if (validator.isNull(obj.fields) || obj.fields.contains('address'))
+        customer.data.address = obj.addressObj;
+      if (validator.isNull(obj.fields) || obj.fields.contains('active'))
+        customer.data.active = obj.active;
+      if (validator.isNull(obj.fields) || obj.fields.contains('create_date'))
+        customer.data.create_date = obj.create_date.toLocaleString();
+      if (validator.isNull(obj.fields) || obj.fields.contains('last_update'))
+        customer.data.last_update = obj.last_update.toLocaleString();
+
+      return customer;
       break;
   }
 };
