@@ -1,8 +1,9 @@
 var mongoose = require('mongoose'),
     async = require('async'),
     error = require('./error.js'),
-    validator = require('validator'),
-    default_limit = 10; // Default page limit
+    validator = require('validator');
+
+var DEFAULT_LIMIT = 10; // Default page limit
 
 exports.present = function(req, res, next) {
   var respond,
@@ -45,7 +46,7 @@ exports.present = function(req, res, next) {
   mongoose.model(req.params.prev)
   .find(parsed_query)
   .skip(req.query.offset !== undefined ? req.query.offset : 0)
-  .limit(req.query.limit !== undefined ? req.query.limit : default_limit)
+  .limit(req.query.limit !== undefined ? req.query.limit : DEFAULT_LIMIT)
   .exec(function (err, data) {
     return respond(err, data, req.params.prev);
   });
