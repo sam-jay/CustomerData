@@ -48,6 +48,7 @@
     } catch (e) { 
       return error.respond(400, res, 'Cannot parse input');
     }
+    // check logic, some people may have an empty second address line.
     if (validator.isNull(address) || validator.isNull(address2) || validator.isNull(district) || validator.isNull(city_id) || validator.isNull(postal_code) || validator.isNull(phone)) 
       return error.respond(400, res, 'Cannot parse input'); 
 
