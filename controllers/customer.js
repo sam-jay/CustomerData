@@ -54,7 +54,7 @@ exports.postCustomer = function(req, res, next) {
         url: '/api/queued_requests/' + queued_request._id
       });
 
-      /* Save new city */
+      /* Save new customer */
       var customer = new Customer();
       customer.first_name = first_name;
       customer.last_name = last_name;
@@ -70,7 +70,57 @@ exports.postCustomer = function(req, res, next) {
           + customer._id);
       });
     });
-}
+};
+
+exports.putCustomer = function(req, res, next) {
+	var first_name = req.body.first_name,
+        last_name = req.body.last_name,
+        email = req.body.email,
+        address_id = req.body.address_id,
+        active = req.body.active,
+        queued_request;
+
+    /* Validate parameters */
+    if (validator.isNull(first_name) &&
+    	validator.isNull(last_name) &&
+    	validator.isNull(email) &&
+    	validator.isNull(address_id) &&
+    	validator.isNull(active))
+    	return error.respond(400, res, 'Cannot parse input');
+
+    /* Look up Customer */
+    Customer.findById(req.params.id, function(err, customer) {
+    	if (err || customer == null) 
+    		return error.respond(404, res, '/api/customers/' + req.params.id);
+    	console.log(customer);
+    	queued_request = queue.push(10000);
+    	res.json(202, {
+    		message: 'Resource accepted (Operation Pending)',
+	        url: '/api/queued_requests/' + queued_request._id	
+    	});
+
+    	/* Update Customer */
+    	if (first_name) customer.first_name = first_name;
+    	if (last_name) customer.last_name = last_name;
+    	if (email) customer.email = email;
+    	if (address_id) customer.addresss = address_id;
+    	if (active) customer.active = active;
+    	customer.last_update = new Date();
+
+    	/* Save */
+	    customer.save(function (err, customer) {
+        if (err)
+          return queued_request.setStatus('Failed');
+
+        queued_request.setStatus('Success');
+        return queued_request.setResource('/api/customers/'
+          + customer._id);
+      });
+
+    });
+
+
+};
 
 exports.delCustomer = function(req, res, next) {
 	if (!(req.params.id === undefined ||
